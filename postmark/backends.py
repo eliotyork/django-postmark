@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core import serializers
 from django.conf import settings
 import httplib2
+import base64
 
 try:
     import json                     
@@ -120,8 +121,11 @@ class PostmarkMessage(dict):
             
             if message.attachments and isinstance(message.attachments, list):
                 if len(message.attachments):
-                    message_dict["Attachments"] = message.attachments
-            
+           	    message_dict["Attachments"] = [{
+                        'Name': n,
+                        'Content': base64.encodestring(c).strip(),
+                        'ContentType': ct,
+                    } for n, c, ct in message.attachments] 
         except:
             if fail_silently:
                 message_dict = {}
